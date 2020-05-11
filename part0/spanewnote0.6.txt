@@ -1,0 +1,5 @@
+title SPA New Note
+
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa (JSON data type)
+server->browser: Status code 201 Created

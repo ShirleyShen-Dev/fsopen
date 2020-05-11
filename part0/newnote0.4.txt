@@ -1,0 +1,21 @@
+title HTTP Post
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+server->browser: Status code 302 (Redirect URL)
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+server->browser: HTML Code
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server->browser: main.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server->browser: main.js
+note over browser: 
+    browser starts executing js code 
+    that requests JSON data from server
+end note
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server->browser: JSON data content [{...}]
+note over browser:
+    browser executes event handler, 
+    which renders notes to page using DOM-API
+end note
+
