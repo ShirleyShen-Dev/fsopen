@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-
+// Content component
 const Content = (props) => {
-  // console.log(props)
   return (
     <>
       <Part part={props.course.parts[0].name} exercises={props.course.parts[0].exercises} />
@@ -12,8 +11,10 @@ const Content = (props) => {
     </>
   )
 }
+
+// Part component
 const Part = (props) => {
-  // console.log(props)
+
   return(
   <>
     <p>
@@ -23,8 +24,8 @@ const Part = (props) => {
   )
 }
 
+//Total count component
 const Total = (props) => {
-  // console.log(props)
   return(
     <>
     <p> Number of exercises {props.course.parts[0].exercises + props.course.parts[1].exercises + props.course.parts[2].exercises}</p>
@@ -32,6 +33,7 @@ const Total = (props) => {
   )
 }
 
+// App component
 const App = () => {
   const course = {
     name: "Half Stack application development",

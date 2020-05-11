@@ -66,7 +66,7 @@ const App = () => {
     bad: 0,
   })
 
-  // mechanism for counting clicks
+  // Mechanism for counting clicks
   const goodClicks = () => {
     setClicks({
       ...clicks,
