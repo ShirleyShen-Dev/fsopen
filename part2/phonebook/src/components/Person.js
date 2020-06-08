@@ -1,5 +1,5 @@
 import React from 'react'
-import DeleteEntry from './DeleteEntry'
+import DeleteButton from './DeleteButton'
 
 const Persons = (props) => {
     let persons = props.persons
@@ -13,7 +13,7 @@ const Persons = (props) => {
         let entry = persons[i]
         if (entry.name.toLowerCase().includes(filter.toLowerCase())) {
           filteredArray.push(entry)
-          console.log(filteredArray)
+          // console.log(filteredArray)
         }
       }
     }
@@ -24,9 +24,9 @@ const Persons = (props) => {
     return(
       <>
         {filteredArray.map(obj => 
-          <div key={obj.name}>
+          <div key={obj.id}>
             {obj.name} {obj.number}
-            <DeleteEntry onDelete={() => deleteEntry(obj.id)}/>
+            <DeleteButton onDelete={() => deleteEntry(obj.id, obj.name)}/>
           </div>
         )}
       </>

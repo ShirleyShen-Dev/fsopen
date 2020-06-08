@@ -1,19 +1,22 @@
 import axios from 'axios'
 const serverURL = 'http://127.0.0.1:3002/persons'
 
-// Get all data from server
+// Fetch data from server
 const getAll = () => {
-    return axios.get(serverURL)
+    const request = axios.get(serverURL)
+    return request.then(response => response.data)
 }
 
 // Add entry to server
-const addEntry = newObject => {
-    return axios.post(serverURL, newObject)
+const addEntry = (newObject) => {
+    const request = axios.post(serverURL, newObject)
+    return request.then(response => response.data)
 }
 
-// Update entry to server
+// Edit existing entry to server
 const editEntry = (id, newObject) => {   
-    return axios.put(`${serverURL}/${id}`, newObject)
+    const request = axios.put(`${serverURL}/${id}`, newObject)
+    return request.then(response => response.data)
 }
 
 const deleteEntry = (id) => {

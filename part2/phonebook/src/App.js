@@ -4,95 +4,191 @@ import PersonForm from './components/PersonForm'
 import Person from './components/Person'
 import personService from './services/Persons'
 
+const SuccessMsg = ({message}) => {
+  // CSS Style for message
+  const successStyle = {
+    color: 'green',
+    backgroundColor: 'lightgrey',
+    padding: 10,
+    margin: 10,
+    fontSize: 18,
+    width: 500,
+    borderLeftStyle: 'solid',
+    borderLeftWidth: 5,
+    borderLeftColor: 'green'
+    
+  }
+  
+  if(message === null) {
+    return null
+  }
+  return (
+    <div style={successStyle}>
+      {message}
+    </div>
+  )
+}
+
+const ErrorMsg = ({message}) => {
+  // CSS Style for message
+  const errorStyle = {
+    color: 'red',
+    backgroundColor: 'lightgrey',
+    padding: 10,
+    margin: 10,
+    fontSize: 18,
+    width: 500,
+    borderLeftStyle: 'solid',
+    borderLeftWidth: 5,
+    borderLeftColor: 'red'
+    
+  }
+  
+  if(message === null) {
+    return null
+  }
+  return (
+    <div style={errorStyle}>
+      {message}
+    </div>
+  )
+}
+
+
 const App = () => {
   // States
   const [ persons, setPersons ] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
-
-  
-  //Event handler for extracting input and adding new person
-  // TO DO - need to fix bug where when new entry is deleted, most recent entry cannot be deleted (causes error)
-  const addEntry = (event) => {
-    event.preventDefault()
-    // Store input in a new object
-    const newObject = {
-      name:newName,
-      number:newNumber
-    }
-
-    // Check if person already in database
-    if(persons.filter(e => e.name.toLowerCase() === newName.toLowerCase()).length > 0) {
-      let answer = window.confirm(`${newName} is already added to phonebook, replace the old phone number with a new one?`)
-
-      if (answer) {
-        console.log('ok')
-
-        // Find entry with same name as new input
-        const entry = persons.find(e => e.name.toLowerCase() === newName.toLowerCase())
-        console.log(entry)
-        const updatedObject = {
-          ...entry,
-          number: newNumber    
-        }
-        console.log(updatedObject)
-
-        // Call editEntry function 
-        personService
-          .editEntry(entry.id)
-          .then(response => {
-            setPersons(persons.map(person => person.id !== entry.id ? person : response.data))
-          })
-        setNewName('')
-        setNewNumber('')
-      }
-      else {
-        setNewName('')
-        setNewNumber('')
-      }
-    }
-    else {
-      // Post new entry to server
-      personService
-        .addEntry(newObject)
-        .then(response => console.log(response))
-
-      setPersons(persons.concat(newObject))
-      setNewName('')
-      setNewNumber('')
-    }
-  }
-
-  const deleteEntry = (id) => {
-    personService
-      .deleteEntry(id)
-      .then(response => console.log(response))
-      .catch(error => console.log('deletion failed'))
-    personService
-      .getAll()
-      .then(response => {
-        setPersons(response.data)
-     })
-  }
+  const [ successMsg, setSuccessMsg ] = useState(null)
+  const [ errorMsg, setErrorMsg ] = useState(null)
 
   // Event handlers
   const nameHandler = (event) => setNewName(event.target.value)
   const numberHandler = (event) => setNewNumber(event.target.value)
   const filterHandler = (event) => setNewFilter(event.target.value)
-
-
-
-
-  // Effect
+  
+  // Effect - load data from server
   useEffect(()=> {
     personService
       .getAll()
-      .then(response => {
-         setPersons(response.data)
-      })
+        .then(initialEntries => {
+          setPersons(initialEntries)
+        })
+        .catch(error => {
+          setErrorMsg(`Unable to load data`)
+          setTimeout(() => {
+            setErrorMsg(null)
+          }, 5000)
+        })
   }, [])
 
+
+  // Add Entry 
+  const addEntry = (newObjectEvent) => {
+    newObjectEvent.preventDefault()
+    const newPerson = {
+      name:newName,
+      number:newNumber
+    }
+
+    // Check for existing listing
+    const matchCheck = persons.filter(e => e.name.toLowerCase() === newName.toLowerCase())
+    if(matchCheck.length > 0) {
+      
+      // Retrieve found object
+      const entry = persons.find(e => e.name.toLowerCase() === newName.toLowerCase())
+      // Confirm change
+      let userConfirm = window.confirm(`${newName} is already in phonebook, replace the old phone number with a new one?`)
+      if (userConfirm) {
+
+        // Create updated object
+        const updatedEntry = {
+          ...entry,
+          number: newNumber    
+        }        
+        
+        // Update object to server
+        personService
+          .editEntry(entry.id, newPerson)
+            .then(returnedEntry => {
+              setPersons(persons.map(person => person.id !== entry.id ? person : returnedEntry))
+              setSuccessMsg(`Updated ${updatedEntry.name}`)
+              setTimeout(() => {
+                setSuccessMsg(null)
+              }, 2000)
+            })
+            .catch(error => {
+              setErrorMsg(`${updatedEntry.name} is not in phonebook`)
+              setTimeout(() => {
+                setErrorMsg(null)
+              }, 2000)
+            })
+
+        // Clear input upon server update
+        setNewName('')
+        setNewNumber('')
+
+      }
+      else {
+        // Clear input upon user cancelation
+        setNewName('')
+        setNewNumber('')
+      }
+
+    }
+    else {
+      
+      personService
+        .addEntry(newPerson)
+          .then(returnedEntry => {
+            setPersons(persons.concat(returnedEntry))
+            setSuccessMsg(`Added ${newName}`)
+            setTimeout(() => {
+              setSuccessMsg(null)
+            }, 2000)
+          })
+          .catch(error => {
+            setErrorMsg(`Failed to add ${newName}`)
+            setTimeout(() => {
+              setErrorMsg(null)
+            }, 2000)
+          })
+
+      // Clear input server update for new entry
+      setNewName('')
+      setNewNumber('')
+
+    }
+  }
+
+  const deleteEntry = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      // delete server request
+      personService
+        .deleteEntry(id)
+          .then(success=> {
+            setSuccessMsg(`Deleted ${name}`)
+            setTimeout(() => {
+              setSuccessMsg(null)
+            }, 2000)
+            console.log('deletion successful')
+          })
+          .catch(error => {
+            setErrorMsg(`Failed to delete ${name}`)
+            setTimeout(() => {
+              setErrorMsg(null)
+            }, 2000)
+          })
+      // fetch data server requests
+      personService
+        .getAll()
+          .then(updatedEntries => {
+            setPersons(updatedEntries)
+          })
+    }
+  }
 
   // Props for children
   let props = {
@@ -109,15 +205,14 @@ const App = () => {
 
   return (
     <div>
+      <SuccessMsg message={successMsg}/>
+      <ErrorMsg message={errorMsg}/>
       <h2>Phonebook</h2>
       <Filter {...props}/>
-
       <h2>Add a new entry</h2>
       <PersonForm {...props}/>
-
       <h2>Numbers</h2>
       <Person {...props} />
-
     </div>
   )
 }

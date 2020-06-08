@@ -1,6 +1,6 @@
 import React from 'react'
 
-const DeleteEntry = ({onDelete}) => {
+const DeleteButton = ({onDelete}) => {
     return (
         <>
             <button onClick={onDelete}>delete</button>
@@ -8,4 +8,4 @@ const DeleteEntry = ({onDelete}) => {
     )
 }
 
-export default DeleteEntry
+export default DeleteButton
