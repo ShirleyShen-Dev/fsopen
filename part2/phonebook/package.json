@@ -1,5 +1,5 @@
 {
-  "name": "phonebook",
+  "name": "phonebook2",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,7 +16,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+<<<<<<< HEAD
     "server": "json-server -p3001 --watch db.json"
+=======
+    "json-server": "json-server --watch db.json --port 3001",
+    "dev": "concurrently \"npm start\" \"npm run json-server\""
+>>>>>>> phonebook
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -34,6 +39,10 @@
     ]
   },
   "devDependencies": {
+<<<<<<< HEAD
+=======
+    "concurrently": "^5.2.0",
+>>>>>>> phonebook
     "json-server": "^0.16.1"
   }
 }
